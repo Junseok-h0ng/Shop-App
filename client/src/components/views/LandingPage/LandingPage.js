@@ -5,6 +5,7 @@ import { Icon, Col, Card, Row } from 'antd'
 import ImageSlider from '../../utils/ImageSlider'
 import CheckBox from './Sections/CheckBox'
 import RadioBox from './Sections/RadioBox'
+import SearchFeature from './Sections/SearchFeature'
 import { continents, price } from './Sections/Datas'
 
 const { Meta } = Card;
@@ -15,6 +16,7 @@ function LandingPage() {
     const [Products, setProducts] = useState([])
     const [Skip, setSkip] = useState(0)
     const [Limit, setLimit] = useState(8)
+    const [SearchTerm, setSearchTerm] = useState("")
     const [PostSize, setPostSize] = useState(0)
     const [Filters, setFilters] = useState({
         continents: [],
@@ -36,7 +38,6 @@ function LandingPage() {
                     } else {
                         setProducts(res.data.productInfo.slice(0, 8))
                     }
-                    console.log(res.data.postSize)
                     setPostSize(res.data.postSize);
                 } else {
                     alert("상품들을 가져오는데 실패했습니다.")
@@ -105,12 +106,25 @@ function LandingPage() {
         setFilters(newFilters)
     }
 
+    const updateSearchTerm = (newSearchTerm) => {
+        let body = {
+            skip: 0,
+            limit: Limit,
+            filters: Filters,
+            searchTerm: newSearchTerm
+        }
+        setSkip(0)
+        setSearchTerm(newSearchTerm)
+        getProducts(body)
+    }
+
     return (
         <div style={{ width: '75%', margin: '3rem auto' }}>
             <div style={{ textAlign: 'center' }}>
                 <h2>Let's Travel Anywhere <Icon type="rocket" /></h2>
             </div>
-            {/* Filter */}
+
+
             <Row gutter={[16, 16]}>
                 <Col lg={12} xs={24}>
                     <CheckBox list={continents} handleFilters={filters => handleFilters(filters, "continents")} />
@@ -119,25 +133,22 @@ function LandingPage() {
                     <RadioBox list={price} handleFilters={filters => handleFilters(filters, "price")} />
                 </Col>
             </Row>
-            {/* CheckBox */}
-
-            {/* RadioBox */}
-
-            {/* Search */}
-
-            {/* Cards */}
-            <Row gutter="16">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '1rem auto' }}>
+                <SearchFeature refreshFunction={newSearchTerm => updateSearchTerm(newSearchTerm)} />
+            </div>
+            <Row gutter={[16, 16]}>
                 {renderCards}
             </Row>
 
-            {PostSize > Limit &&
+            {
+                PostSize > Limit &&
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button onClick={loadMoreHandler}>더보기</button>
                 </div>
             }
 
 
-        </div>
+        </div >
     )
 }
 
