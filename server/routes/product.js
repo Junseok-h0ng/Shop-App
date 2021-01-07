@@ -36,7 +36,25 @@ router.post('/products', auth, (req, res) => {
     let skip = req.body.skip ? parseInt(req.body.skip) : 0;
     let limit = req.body.limit ? parseInt(req.body.limit) : 9;
 
-    Product.find()
+    let findArgs = {};
+    for (let key in req.body.filters) {
+        if (req.body.filters[key].length > 0) {
+            console.log(key)
+            if (key === "price") {
+                findArgs[key] = {
+                    // Greater than equals ~보다 크고
+                    $gte: req.body.filters[key][0],
+                    // Less than equals ~보다 작고
+                    $lte: req.body.filters[key][1]
+                }
+            } else {
+                findArgs[key] = req.body.filters[key];
+            }
+
+        }
+    }
+    console.log(findArgs)
+    Product.find(findArgs)
         .populate("writer")
         .skip(skip)
         .limit(limit)
