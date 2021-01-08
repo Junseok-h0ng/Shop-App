@@ -16,6 +16,19 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).single('file');
 
+router.get('/product_by_id', (req, res) => {
+    console.log(req.query)
+    let type = req.query.type;
+    let productId = req.query.id;
+
+    Product.find({ _id: productId })
+        .populate('writer')
+        .exec((err, product) => {
+            if (err) return res.status(400).send(err);
+            return res.status(200).json({ success: true, product })
+        })
+})
+
 router.post('/', auth, (req, res) => {
     const product = new Product(req.body);
     product.save((err, result) => {
